@@ -18,6 +18,10 @@ function remove_cards!(players)
     return nothing 
 end
 
+function remove_cards!(player, card)
+    filter!(c -> c ≠ card, player.cards)
+end 
+
 function scratch!(game, players)
     (;units,horses) = game
     Θ = [1,2,3,4,5,6,5,4,3,2,1] / 32
@@ -30,6 +34,7 @@ function scratch!(game, players)
         for (k,p) ∈ players 
             if has_card(p, id)
                 exchange!(game, p, money)
+                remove_cards!(p, id)
             end
         end
     end 
@@ -57,9 +62,13 @@ end
 
 function split_pot!(game, players, win_id)
     for (k,p) ∈ players 
-        c = sum(p.cards .== win_id)
-        p.money += (c / 4) * game.pot
+        p.money += compute_payoff(game, p, win_id)
     end
+end
+
+function compute_payoff(game, player::Player, win_id)
+    c = sum(player.cards .== win_id)
+    return (c / 4) * game.pot
 end
 
 function init_horses()

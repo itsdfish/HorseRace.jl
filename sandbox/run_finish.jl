@@ -9,6 +9,8 @@ using StatsBase, StatsPlots, DataFrames
 ############################################################################################################
 #                                         define simulation
 ############################################################################################################
+has_won(horse) = horse.steps == horse.max_steps
+
 function race!()  
     horses = init_horses()
     ids = sample(2:12, 4, replace=false)
@@ -29,7 +31,6 @@ end
 #                                         run simulation
 ############################################################################################################
 Random.seed!(454)
-
 results = map(_ -> race!(), 1:100_000)
 winners = map(x -> x[1], results)
 rolls = map(x -> x[2], results)
@@ -37,7 +38,7 @@ rolls = map(x -> x[2], results)
 #                                         plot results
 ############################################################################################################
 pyplot()
-
+game = Game()
 dice_rolls = map(x -> roll(game.dice), 1:100_000)
 histogram(dice_rolls, xlabel="horse number", xticks = 2:12,
     ylabel="roll probability", normalize=:probability,
